@@ -1,0 +1,6 @@
+*.elc
+/scratch.el
+.#*
+/sandbox/
+/.sandbox/
+/worktrees/
