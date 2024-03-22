@@ -1,0 +1,30 @@
+HTTP/2 200 
+date: Mon, 18 Mar 2024 09:21:55 GMT
+content-type: text/event-stream
+access-control-allow-origin: *
+cache-control: no-cache, must-revalidate
+openai-model: gpt-3.5-turbo-0125
+openai-organization: user-fw69wrkwmbvzme6szvt8tcol
+openai-processing-ms: 324
+openai-version: 2020-10-01
+strict-transport-security: max-age=15724800; includeSubDomains
+x-ratelimit-limit-requests: 10000
+x-ratelimit-limit-tokens: 60000
+x-ratelimit-remaining-requests: 9999
+x-ratelimit-remaining-tokens: 59971
+x-ratelimit-reset-requests: 8.64s
+x-ratelimit-reset-tokens: 29ms
+x-request-id: req_354442e58bd8858eb36ec66252b064bc
+cf-cache-status: DYNAMIC
+server: cloudflare
+cf-ray: 866427bfef893bbf-WAW
+alt-svc: h3=":443"; ma=86400
+
+data: {"id":"chatcmpl-943TnFu5Ta6soqBxGjdFglP8og3L0","object":"chat.completion.chunk","created":1710753715,"model":"gpt-3.5-turbo-0125","system_fingerprint":"fp_4f2ebda25a","choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-943TnFu5Ta6soqBxGjdFglP8og3L0","object":"chat.completion.chunk","created":1710753715,"model":"gpt-3.5-turbo-0125","system_fingerprint":"fp_4f2ebda25a","choices":[{"index":0,"delta":{"content":"🙂"},"logprobs":null,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-943TnFu5Ta6soqBxGjdFglP8og3L0","object":"chat.completion.chunk","created":1710753715,"model":"gpt-3.5-turbo-0125","system_fingerprint":"fp_4f2ebda25a","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+
+data: [DONE]
+
