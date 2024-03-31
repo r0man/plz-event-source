@@ -312,7 +312,7 @@
 
 ;; Buffer event source
 
-(defclass plz-buffer-event-source (plz-event-source)
+(defclass plz-event-source-buffer (plz-event-source)
   ((buffer
     :initarg :buffer
     :documentation "The event source buffer."
@@ -323,7 +323,7 @@
     :type (or null plz-event-source-parser)))
   "A server sent event source using curl for HTTP.")
 
-(cl-defmethod plz-event-source-insert ((source plz-buffer-event-source) data)
+(cl-defmethod plz-event-source-insert ((source plz-event-source-buffer) data)
   "Insert DATA into the event SOURCE buffer, parse and dispatch events."
   (with-slots (parser) source
     (plz-event-source-parser-insert parser data)
@@ -338,7 +338,7 @@
     (re-search-forward plz-http-end-of-headers-regexp nil t)
     (point)))
 
-(cl-defmethod plz-event-source-open ((source plz-buffer-event-source))
+(cl-defmethod plz-event-source-open ((source plz-event-source-buffer))
   "Open a connection to the URL of the event SOURCE."
   (with-slots (buffer errors options ready-state parser) source
     (with-current-buffer (get-buffer-create buffer)
@@ -351,7 +351,7 @@
         (plz-event-source-dispatch-event source event)
         source))))
 
-(cl-defmethod plz-event-source-close ((source plz-buffer-event-source))
+(cl-defmethod plz-event-source-close ((source plz-event-source-buffer))
   "Close the connection of the event SOURCE."
   (with-slots (buffer ready-state) source
     (let ((event (plz-event-source-event :type 'close)))
@@ -359,7 +359,7 @@
       (plz-event-source-dispatch-event source event)
       source)))
 
-(defclass plz-http-event-source (plz-event-source)
+(defclass plz-event-source-http (plz-event-source)
   ((process
     :initarg :process
     :documentation "The process of the event source."
@@ -376,7 +376,7 @@
     (let ((media-type (plz-media-type:text/event-stream :events handlers)))
       (cons (cons 'text/event-stream media-type) plz-media-types))))
 
-(cl-defmethod plz-event-source-open ((source plz-http-event-source))
+(cl-defmethod plz-event-source-open ((source plz-event-source-http))
   "Open a connection to the URL of the event SOURCE."
   (with-slots (errors options process ready-state response url) source
     (setf ready-state 'connecting)
@@ -395,7 +395,7 @@
                                (setf ready-state 'closed))))
     source))
 
-(cl-defmethod plz-event-source-close ((source plz-http-event-source))
+(cl-defmethod plz-event-source-close ((source plz-event-source-http))
   "Close the connection of the event SOURCE."
   (with-slots (process ready-state) source
     (delete-process process)
@@ -438,7 +438,7 @@ callbacks will always be set to nil.")
                       :status (plz-response-status chunk)
                       :headers (plz-response-headers chunk)))
            (source (plz-event-source-open
-                    (plz-buffer-event-source
+                    (plz-event-source-buffer
                      :buffer (buffer-name (process-buffer process))
                      :handlers (seq-map
                                 (lambda (pair)

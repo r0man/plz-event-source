@@ -188,7 +188,7 @@
                      :data "This is the second message, it\nhas two lines."
                      :origin (buffer-name)))
            (all-events) (close-events) (error-events) (message-events) (open-events)
-           (source (plz-buffer-event-source
+           (source (plz-event-source-buffer
                     :buffer (buffer-name)
                     :handlers `((open . ,(lambda (source event)
                                            (push event open-events)
@@ -239,7 +239,7 @@
 (ert-deftest test-plz-event-source-http-event-source ()
   (plz-event-source-test-with-mock-response (plz-event-source-test-response "text/event-stream/openai-hello.txt")
     (let* ((all-events) (close-events) (error-events) (message-events) (open-events)
-           (source (plz-http-event-source
+           (source (plz-event-source-http
                     :url "https://api.openai.com/v1/chat/completions"
                     :options `((body . ,(json-encode
                                          '(("model" . "gpt-3.5-turbo")
