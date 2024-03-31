@@ -404,7 +404,8 @@
 ;; Content Type: text/event-stream
 
 (defclass plz-event-source:text/event-stream (plz-media-type:application/octet-stream)
-  ((type :initform 'text)
+  ((coding-system :initform 'utf-8)
+   (type :initform 'text)
    (subtype :initform 'event-stream)
    (events :documentation "Association list from event type to handler."
            :initarg :events
@@ -456,8 +457,9 @@ ELSE callbacks will always be set to nil.")
                                      (t pair))))
                                 (oref media-type events))))))
       (setq-local plz-event-source--current source)))
-  (plz-event-source-insert plz-event-source--current (plz-response-body chunk))
-  (set-marker (process-mark process) (point)))
+  (let ((body (plz-media-type-decode-string media-type (plz-response-body chunk))))
+    (plz-event-source-insert plz-event-source--current body)
+    (set-marker (process-mark process) (point))))
 
 (cl-defmethod plz-media-type-then ((media-type plz-event-source:text/event-stream) response)
   "Transform the RESPONSE into a format suitable for MEDIA-TYPE."
