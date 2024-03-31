@@ -42,7 +42,7 @@ Emacs using the ~package-install~ command.
 :TOC:      :depth 1
 :END:
 
-This library provides the ~plz-media-type:text/event-stream~ class,
+This library provides the ~plz-event-source:text/event-stream~ class,
 which is a media type implementation for server sent events. It should
 be used with the [[https://github.com/r0man/plz-media-type#usage][plz-media-type-request]] function of the [[https://github.com/r0man/plz-media-type][plz-media-type]]
 library.
@@ -56,7 +56,7 @@ large language model.
   (plz-media-type-request
     'post "https://api.openai.com/v1/chat/completions"
     :as `(media-types ((text/event-stream
-                        . ,(plz-media-type:text/event-stream
+                        . ,(plz-event-source:text/event-stream
                             :events `((open . (lambda (source event)
                                                 (message "open: %s" event)))
                                       (message . (lambda (source event)
