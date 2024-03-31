@@ -86,7 +86,7 @@ temporary filename is used."
 
 (defun plz-event-source-test-response (example)
   "Return the HTTP test response filename for EXAMPLE."
-  (if-let (file (locate-dominating-file "." "plz.el" ))
+  (if-let (file (locate-dominating-file "." ".git" ))
       (let ((filename (expand-file-name (concat file "tests/response/" example))))
         (if (file-exists-p filename)
             filename
