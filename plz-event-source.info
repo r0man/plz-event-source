@@ -73,7 +73,7 @@ File: README.info,  Node: Usage,  Next: Credits,  Prev: Installation,  Up: Top
 2 Usage
 *******
 
-This library provides the ‘plz-media-type:text/event-stream’ class,
+This library provides the ‘plz-event-source:text/event-stream’ class,
 which is a media type implementation for server sent events.  It should
 be used with the plz-media-type-request
 (https://github.com/r0man/plz-media-type#usage) function of the
@@ -95,7 +95,7 @@ language model.
      (plz-media-type-request
        'post "https://api.openai.com/v1/chat/completions"
        :as `(media-types ((text/event-stream
-                           . ,(plz-media-type:text/event-stream
+                           . ,(plz-event-source:text/event-stream
                                :events `((open . (lambda (source event)
                                                    (message "open: %s" event)))
                                          (message . (lambda (source event)
@@ -157,10 +157,10 @@ Node: Top227
 Node: Installation1200
 Node: GNU ELPA1332
 Node: Usage1590
-Node: Examples2027
-Node: Credits3537
-Node: Copyright assignment3800
-Node: License4384
+Node: Examples2029
+Node: Credits3541
+Node: Copyright assignment3804
+Node: License4388
 
 End Tag Table
 

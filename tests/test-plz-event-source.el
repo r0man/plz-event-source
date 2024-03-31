@@ -309,7 +309,7 @@
            (process (plz-media-type-request 'post "MOCK-URL"
                       :as `(media-types
                             ,(cons (cons 'text/event-stream
-                                         (plz-media-type:text/event-stream
+                                         (plz-event-source:text/event-stream
                                           :events `((open . ,(lambda (_ event)
                                                                (push event open-events)))
                                                     (message . ,(lambda (_ event)
@@ -350,7 +350,7 @@
            (process (plz-media-type-request 'post "MOCK-URL"
                       :as `(media-types
                             ,(cons (cons 'text/event-stream
-                                         (plz-media-type:text/event-stream
+                                         (plz-event-source:text/event-stream
                                           :events `((open . ,(lambda (_ event)
                                                                (push event open-events)))
                                                     (message . ,(lambda (_ event)

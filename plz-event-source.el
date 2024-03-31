@@ -373,7 +373,7 @@
 (defun plz-event-source--media-types (source)
   "Return the media types of the event SOURCE."
   (with-slots (handlers) source
-    (let ((media-type (plz-media-type:text/event-stream :events handlers)))
+    (let ((media-type (plz-event-source:text/event-stream :events handlers)))
       (cons (cons 'text/event-stream media-type) plz-media-types))))
 
 (cl-defmethod plz-event-source-open ((source plz-event-source-http))
@@ -403,7 +403,7 @@
 
 ;; Content Type: text/event-stream
 
-(defclass plz-media-type:text/event-stream (plz-media-type:application/octet-stream)
+(defclass plz-event-source:text/event-stream (plz-media-type:application/octet-stream)
   ((type :initform 'text)
    (subtype :initform 'event-stream)
    (events :documentation "Association list from event type to handler."
@@ -423,7 +423,7 @@ callbacks will always be set to nil.")
 (defvar-local plz-event-source--current nil
   "The event source of the current buffer.")
 
-(cl-defmethod plz-media-type-else ((_ plz-media-type:text/event-stream) error)
+(cl-defmethod plz-media-type-else ((_ plz-event-source:text/event-stream) error)
   "Transform the ERROR into a format suitable for MEDIA-TYPE."
   (let* ((source plz-event-source--current)
          (event (plz-event-source-event :type 'error :data error)))
@@ -431,7 +431,7 @@ callbacks will always be set to nil.")
     (plz-event-source-dispatch-event source event)
     error))
 
-(cl-defmethod plz-media-type-process ((media-type plz-media-type:text/event-stream) process chunk)
+(cl-defmethod plz-media-type-process ((media-type plz-event-source:text/event-stream) process chunk)
   "Process the CHUNK according to MEDIA-TYPE using PROCESS."
   (unless plz-event-source--current
     (let* ((response (make-plz-response
@@ -459,7 +459,7 @@ callbacks will always be set to nil.")
   (plz-event-source-insert plz-event-source--current (plz-response-body chunk))
   (set-marker (process-mark process) (point)))
 
-(cl-defmethod plz-media-type-then ((media-type plz-media-type:text/event-stream) response)
+(cl-defmethod plz-media-type-then ((media-type plz-event-source:text/event-stream) response)
   "Transform the RESPONSE into a format suitable for MEDIA-TYPE."
   (plz-event-source-close plz-event-source--current)
   (cl-call-next-method media-type response)
