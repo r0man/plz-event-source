@@ -58,7 +58,6 @@
 
 (ert-deftest test-plz-event-source-parse-event-types ()
   (with-temp-buffer
-
     (let ((event-1 (plz-event-source-event
                     :type 'add
                     :data "73857293"
@@ -213,6 +212,7 @@
                                             (should (equal 'close (plz-event-source-event-type event)))))))))
       (with-slots (parser) source
         (plz-event-source-open source)
+        (sit-for 0.1)
         (should (equal 1 (length open-events)))
         (seq-doseq (event open-events)
           (with-slots (data type) event
@@ -222,13 +222,16 @@
         (plz-event-source-insert source "data: This is the first message.\n")
         (should (null message-events))
         (plz-event-source-insert source "\n")
+        (sit-for 0.1)
         (should (equal (list event-1) message-events))
         (plz-event-source-insert source "data: This is the second message, it\n")
         (plz-event-source-insert source "data: has two lines.\n")
         (plz-event-source-insert source "\n")
         (plz-event-source-insert source "data: This is the third message.\n")
+        (sit-for 0.1)
         (should (equal (list event-2 event-1) message-events))
         (plz-event-source-close source)
+        (sit-for 0.1)
         (should (equal 1 (length close-events)))
         (seq-doseq (event close-events)
           (with-slots (data type) event
@@ -289,6 +292,9 @@
             (should (equal 200 (plz-response-status data)))
             (should (null (plz-response-body data)))))
         (should (equal 0 (length error-events)))
+        (should (equal "Hello! How can I assist you today?"
+                       (plz-event-source-test-openai-extract-content message-events)))
+        (sit-for 0.1)
         (should (equal 1 (length close-events)))
         (seq-doseq (event close-events)
           (with-slots (data type) event
@@ -299,9 +305,7 @@
         (should (equal (list 'open 'message 'close)
                        (cl-remove-duplicates
                         (seq-map #'plz-event-source-event-type
-                                 (reverse all-events)))))
-        (should (equal "Hello! How can I assist you today?"
-                       (plz-event-source-test-openai-extract-content message-events)))))))
+                                 (reverse all-events)))))))))
 
 (ert-deftest test-plz-event-source:text/event-stream ()
   (plz-event-source-test-with-mock-response (plz-event-source-test-response "text/event-stream/openai-hello.txt")
@@ -332,6 +336,7 @@
           (should (plz-response-p data))
           (should (equal 200 (plz-response-status data)))
           (should (null (plz-response-body data)))))
+      (sit-for 0.1)
       (should (equal 0 (length error-events)))
       (should (equal 1 (length close-events)))
       (seq-doseq (event close-events)
@@ -364,6 +369,7 @@
                       :finally (lambda () (push t finally))
                       :then (lambda (object) (push object then)))))
       (plz-event-source-test-wait process)
+      (sit-for 0.1)
       (should (null else))
       (should (equal '(t) finally))
       (should (equal 1 (length open-events)))
@@ -373,6 +379,8 @@
           (should (plz-response-p data))
           (should (equal 200 (plz-response-status data)))
           (should (null (plz-response-body data)))))
+      (should (equal 4 (length message-events)))
+      (should (equal "🙂" (plz-event-source-test-openai-extract-content message-events)))
       (should (equal 0 (length error-events)))
       (should (equal 1 (length close-events)))
       (seq-doseq (event close-events)
@@ -380,9 +388,7 @@
           (should (equal 'close type))
           (should (plz-response-p data))
           (should (equal 200 (plz-response-status data)))
-          (should (null (plz-response-body data)))))
-      (should (equal 4 (length message-events)))
-      (should (equal "🙂" (plz-event-source-test-openai-extract-content message-events))))))
+          (should (null (plz-response-body data))))))))
 
 ;;;; footer
 
