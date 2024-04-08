@@ -205,6 +205,13 @@
       (while (plz-event-source-parser-parse-line parser))
       events)))
 
+(defun plz-event-source-parser--end-of-headers ()
+  "Return the end of headers position in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward plz-http-end-of-headers-regexp nil t)
+    (point)))
+
 (defun plz-event-source-parser-parse-line (parser)
   "Parse a line from the event stream in the PARSER buffer."
   (with-slots (buffer position) parser
@@ -278,7 +285,7 @@
                                  handlers))
     source))
 
-(defun plz-event-source-dispatch-event (source event)
+(defun plz-event-source--dispatch-event (source event)
   "Dispatch the EVENT to the listeners of event SOURCE."
   (with-slots (handlers) source
     (dolist (pair handlers)
@@ -292,23 +299,16 @@
                               (list (cdr pair) event))
           (timer-activate timer))))))
 
-(defun plz-event-source-dispatch-events (source events)
+(defun plz-event-source--dispatch-events (source events)
   "Dispatch the EVENTS to the listeners of event SOURCE."
   (dolist (event (reverse events))
-    (plz-event-source-dispatch-event source event)))
+    (plz-event-source--dispatch-event source event)))
 
 (defun plz-event-source--response-in-buffer-p ()
   "Return non-nil the if point is looking at a HTTP response."
   (save-excursion
     (goto-char (point-min))
     (re-search-forward plz-http-end-of-headers-regexp nil t)))
-
-(defun plz-event-source-parser--end-of-headers ()
-  "Return the end of headers position in the current buffer."
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward plz-http-end-of-headers-regexp nil t)
-    (point)))
 
 ;; Buffer event source
 
@@ -328,7 +328,7 @@
   (with-slots (parser) source
     (plz-event-source-parser--insert parser data)
     (with-slots (events) parser
-      (plz-event-source-dispatch-events source events)
+      (plz-event-source--dispatch-events source events)
       (setf events nil))))
 
 (defun plz-event-source--buffer-start-position ()
@@ -348,7 +348,7 @@
                       :buffer buffer
                       :position (plz-event-source--buffer-start-position)))
         (setf ready-state 'open)
-        (plz-event-source-dispatch-event source event)
+        (plz-event-source--dispatch-event source event)
         source))))
 
 (cl-defmethod plz-event-source-close ((source plz-event-source-buffer))
@@ -356,7 +356,7 @@
   (with-slots (buffer ready-state) source
     (let ((event (plz-event-source-event :type 'close)))
       (setf ready-state 'closed)
-      (plz-event-source-dispatch-event source event)
+      (plz-event-source--dispatch-event source event)
       source)))
 
 (defclass plz-event-source-http (plz-event-source)
@@ -429,7 +429,7 @@ ELSE callbacks will always be set to nil.")
   (let* ((source plz-event-source--current)
          (event (plz-event-source-event :type 'error :data error)))
     (plz-event-source-close source)
-    (plz-event-source-dispatch-event source event)
+    (plz-event-source--dispatch-event source event)
     error))
 
 (cl-defmethod plz-media-type-process ((media-type plz-event-source:text/event-stream) process chunk)
