@@ -267,7 +267,7 @@
 (cl-defgeneric plz-event-source-close (source)
   "Close the event SOURCE.")
 
-(cl-defgeneric plz-event-source-insert (source data)
+(cl-defgeneric plz-event-source--insert (source data)
   "Insert DATA into the event SOURCE buffer, parse and dispatch events.")
 
 (defun plz-event-source-add-listener (source type listener)
@@ -330,7 +330,7 @@
     :type (or null plz-event-source-parser)))
   "A server sent event source using curl for HTTP.")
 
-(cl-defmethod plz-event-source-insert ((source plz-event-source-buffer) data)
+(cl-defmethod plz-event-source--insert ((source plz-event-source-buffer) data)
   "Insert DATA into the event SOURCE buffer, parse and dispatch events."
   (with-slots (parser) source
     (plz-event-source-parser-insert parser data)
@@ -465,7 +465,7 @@ ELSE callbacks will always be set to nil.")
                                 (oref media-type events))))))
       (setq-local plz-event-source--current source)))
   (let ((body (plz-media-type-decode-coding-string media-type (plz-response-body chunk))))
-    (plz-event-source-insert plz-event-source--current body)
+    (plz-event-source--insert plz-event-source--current body)
     (set-marker (process-mark process) (point))))
 
 (cl-defmethod plz-media-type-then ((media-type plz-event-source:text/event-stream) response)
