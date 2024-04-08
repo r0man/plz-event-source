@@ -464,7 +464,7 @@ ELSE callbacks will always be set to nil.")
                                      (t pair))))
                                 (oref media-type events))))))
       (setq-local plz-event-source--current source)))
-  (let ((body (plz-media-type-decode-string media-type (plz-response-body chunk))))
+  (let ((body (plz-media-type-decode-coding-string media-type (plz-response-body chunk))))
     (plz-event-source-insert plz-event-source--current body)
     (set-marker (process-mark process) (point))))
 
