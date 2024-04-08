@@ -57,12 +57,12 @@ large language model.
     'post "https://api.openai.com/v1/chat/completions"
     :as `(media-types ((text/event-stream
                         . ,(plz-event-source:text/event-stream
-                            :events `((open . (lambda (source event)
-                                                (message "open: %s" event)))
-                                      (message . (lambda (source event)
-                                                   (message "message: %s" event)))
-                                      (close . (lambda (source event)
-                                                 (message "close: %s" event))))))))
+                            :handlers `((open . (lambda (event)
+                                                  (message "open: %s" event)))
+                                        (message . (lambda (event)
+                                                     (message "message: %s" event)))
+                                        (close . (lambda (event)
+                                                   (message "close: %s" event))))))))
     :body (json-encode
            '(("model" . "gpt-3.5-turbo")
              ("messages" . [(("role" . "system")
