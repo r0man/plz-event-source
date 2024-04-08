@@ -109,31 +109,31 @@
     :type integer))
   "The server sent event stream parser.")
 
-(defconst plz-event-source--end-of-line-regexp
+(defconst plz-event-source-parser--end-of-line-regexp
   (rx (or "\r\n" "\n" "\r"))
   "Regular expression matching the end of a line.")
 
-(defconst plz-event-source--line-regexp
+(defconst plz-event-source-parser--line-regexp
   (rx (* not-newline) (or "\r\n" "\n" "\r"))
   "Regular expression matching a line of the event source stream.")
 
-(defun plz-event-source--parse-bom (line)
+(defun plz-event-source-parser--parse-bom (line)
   "Parse the Byte Order Mark (BOM) from LINE."
   (if (string-prefix-p "\uFEFF" line)
       (substring line 1)
     line))
 
-(defun plz-event-source--looking-at-line-p ()
+(defun plz-event-source-parser--looking-at-line-p ()
   "Return non-nil if the current line matches the event source line regexp."
-  (looking-at plz-event-source--line-regexp))
+  (looking-at plz-event-source-parser--line-regexp))
 
-(defun plz-event-source--parse-line ()
+(defun plz-event-source-parser--parse-line ()
   "Return non-nil if the current line matches the event source line regexp."
-  (when (looking-at plz-event-source--line-regexp)
+  (when (looking-at plz-event-source-parser--line-regexp)
     (string-trim-right (delete-and-extract-region (match-beginning 0) (match-end 0))
-                       plz-event-source--end-of-line-regexp)))
+                       plz-event-source-parser--end-of-line-regexp)))
 
-(defun plz-event-source--dispatch-event (parser)
+(defun plz-event-source-parser--dispatch-event (parser)
   "Dispatch an event from PARSER to registered listeners."
   (with-slots (data-buffer event-type-buffer events last-event-id last-event-id-buffer) parser
     (setf last-event-id last-event-id-buffer)
@@ -155,46 +155,39 @@
           (setf events (cons event events))
           event)))))
 
-(defun plz-event-source--process-event (parser field value)
+(defun plz-event-source-parser--process-event (parser field value)
   "Process the FIELD and VALUE from PARSER as a event."
   (ignore field)
   (with-slots (event-type-buffer) parser
     (setf event-type-buffer value)))
 
-(defun plz-event-source--process-data (parser field value)
+(defun plz-event-source-parser--process-data (parser field value)
   "Process the FIELD and VALUE from PARSER as data."
   (ignore field)
   (with-slots (data-buffer) parser
     (setf data-buffer (concat data-buffer value "\n"))))
 
-(defun plz-event-source--process-id (parser field value)
+(defun plz-event-source-parser--process-id (parser field value)
   "Process the FIELD and VALUE from PARSER as event id."
   (ignore field)
   (unless (string-match "\u0000" value)
     (with-slots (last-event-id-buffer) parser
       (setf last-event-id-buffer value))))
 
-(defun plz-event-source--process-retry (parser field value)
-  "Process the FIELD and VALUE from PARSER as event id."
-  (ignore parser)
-  (message "TODO: Process retry for field %s and value %s." field value))
-
 (defun plz-event-source--process-field (parser field value)
   "Process the FIELD and VALUE from PARSER."
   (cond ((equal "event" field)
-         (plz-event-source--process-event parser field value))
+         (plz-event-source-parser--process-event parser field value))
         ((equal "data" field)
-         (plz-event-source--process-data parser field value))
+         (plz-event-source-parser--process-data parser field value))
         ((equal "id" field)
-         (plz-event-source--process-id parser field value))
-        ((equal "retry" field)
-         (plz-event-source--process-retry parser field value))))
+         (plz-event-source-parser--process-id parser field value))))
 
-(defun plz-event-source--process-line (parser line)
+(defun plz-event-source-parser--process-line (parser line)
   "Parse a LINE of the event stream PARSER and dispatch events."
   (cond ((string-prefix-p ":" line))
         ((string-blank-p line)
-         (plz-event-source--dispatch-event parser))
+         (plz-event-source-parser--dispatch-event parser))
         ((string-match ":" line)
          (let ((field (substring line 0 (match-beginning 0)))
                (value (substring line (match-end 0))))
@@ -204,32 +197,32 @@
                                               value))))
         (t (plz-event-source--process-field parser line ""))))
 
-(defun plz-event-source-parse-line (parser)
+(defun plz-event-source-parser-parse-line (parser)
   "Parse a line from the event stream in the PARSER buffer."
   (with-slots (buffer position) parser
     (with-current-buffer buffer
       (save-excursion
         (goto-char position)
-        (when-let (line (plz-event-source--parse-line))
+        (when-let (line (plz-event-source-parser--parse-line))
           (setf position (point))
-          (plz-event-source--process-line parser line)
+          (plz-event-source-parser--process-line parser line)
           line)))))
 
-(defun plz-event-source-parse-stream (parser)
+(defun plz-event-source-parser-parse (parser)
   "Parse the event stream in the the PARSER buffer."
   (with-slots (buffer handlers) parser
     (with-current-buffer (get-buffer buffer)
       (goto-char (point-min))
       (while (not (eobp))
-        (when-let (line (plz-event-source--parse-line))
-          (plz-event-source--process-line parser line))))))
+        (when-let (line (plz-event-source-parser--parse-line))
+          (plz-event-source-parser--process-line parser line))))))
 
-(defun plz-event-source-parser-insert (parser string)
+(defun plz-event-source-parser--insert (parser string)
   "Insert STRING into the buffer of the event PARSER."
   (with-slots (buffer events position) parser
     (with-current-buffer (get-buffer buffer)
       (insert string)
-      (while (plz-event-source-parse-line parser))
+      (while (plz-event-source-parser-parse-line parser))
       events)))
 
 ;; Event Source
@@ -333,7 +326,7 @@
 (cl-defmethod plz-event-source--insert ((source plz-event-source-buffer) data)
   "Insert DATA into the event SOURCE buffer, parse and dispatch events."
   (with-slots (parser) source
-    (plz-event-source-parser-insert parser data)
+    (plz-event-source-parser--insert parser data)
     (with-slots (events) parser
       (plz-event-source-dispatch-events source events)
       (setf events nil))))
