@@ -197,6 +197,14 @@
                                               value))))
         (t (plz-event-source--process-field parser line ""))))
 
+(defun plz-event-source-parser--insert (parser string)
+  "Insert STRING into the buffer of the event PARSER."
+  (with-slots (buffer events position) parser
+    (with-current-buffer (get-buffer buffer)
+      (insert string)
+      (while (plz-event-source-parser-parse-line parser))
+      events)))
+
 (defun plz-event-source-parser-parse-line (parser)
   "Parse a line from the event stream in the PARSER buffer."
   (with-slots (buffer position) parser
@@ -216,14 +224,6 @@
       (while (not (eobp))
         (when-let (line (plz-event-source-parser--parse-line))
           (plz-event-source-parser--process-line parser line))))))
-
-(defun plz-event-source-parser--insert (parser string)
-  "Insert STRING into the buffer of the event PARSER."
-  (with-slots (buffer events position) parser
-    (with-current-buffer (get-buffer buffer)
-      (insert string)
-      (while (plz-event-source-parser-parse-line parser))
-      events)))
 
 ;; Event Source
 
