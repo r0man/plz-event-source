@@ -1,4 +1,4 @@
-;;; plz-event-source.el --- Server Sent Event Source -*- lexical-binding: t; -*-
+;;; plz-event-source.el --- Plz Event Source -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019-2023  Free Software Foundation, Inc.
 
@@ -6,7 +6,7 @@
 ;; Maintainer: r0man <roman@burningswell.com>
 ;; URL: https://github.com/r0man/plz-event-source.el
 ;; Version: 0.1-pre
-;; Package-Requires: ((emacs "26.3"))
+;; Package-Requires: ((emacs "26.3") (plz "0.8"))
 ;; Keywords: comm, network, http
 
 ;; This file is part of GNU Emacs.
