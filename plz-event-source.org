@@ -1,0 +1,123 @@
+#+TITLE: plz-event-source
+
+#+PROPERTY: LOGGING nil
+
+# NOTE: It would be preferable to put these at the bottom of the file under the export options heading, but it seems that "TEXINFO_DIR_CATEGORY" only works at the top of the file.
+#+EXPORT_FILE_NAME: plz-event-source.texi
+#+TEXINFO_DIR_CATEGORY: Emacs
+#+TEXINFO_DIR_TITLE: Plz Event Source: (plz-event-source)
+#+TEXINFO_DIR_DESC: Event Source extension for plz.el
+
+# Note: This readme works with the org-make-toc <https://github.com/alphapapa/org-make-toc> package, which automatically updates the table of contents.
+
+~plz-event-source~ provides a [[https://github.com/r0man/plz-media-type][plz-media-type]], a parser and an event
+source implementation for the [[https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events][Server Sent Event (SSE)]] protocol. It is
+used in the [[https://github.com/ahyatt/llm][LLM]] library to handle server sent events.
+
+* Contents :noexport:
+:PROPERTIES:
+:TOC:      :include siblings
+:END:
+:CONTENTS:
+- [[#installation][Installation]]
+- [[#usage][Usage]]
+  - [[#examples][Examples]]
+- [[#credits][Credits]]
+  - [[#copyright-assignment][Copyright assignment]]
+:END:
+
+* Installation
+:PROPERTIES:
+:TOC:      :depth 0
+:END:
+
+** GNU ELPA
+
+~plz-event-source~ is available in [[http://elpa.gnu.org/packages/plz-event-source.html][GNU ELPA]].  It may be installed in
+Emacs using the ~package-install~ command.
+
+* Usage
+:PROPERTIES:
+:TOC:      :depth 1
+:END:
+
+This library provides the ~plz-event-source:text/event-stream~ class,
+which is a media type implementation for server sent events. It should
+be used with the [[https://github.com/r0man/plz-media-type#usage][plz-media-type-request]] function of the [[https://github.com/r0man/plz-media-type][plz-media-type]]
+library.
+
+** Examples
+
+The following example shows how to request chat completions from a
+large language model.
+
+#+BEGIN_SRC elisp :exports code :results value code :cache yes
+  (plz-media-type-request
+    'post "https://api.openai.com/v1/chat/completions"
+    :as `(media-types ((text/event-stream
+                        . ,(plz-event-source:text/event-stream
+                            :handlers `((open . (lambda (event)
+                                                  (message "open: %s" event)))
+                                        (message . (lambda (event)
+                                                     (message "message: %s" event)))
+                                        (close . (lambda (event)
+                                                   (message "close: %s" event))))))))
+    :body (json-encode
+           '(("model" . "gpt-3.5-turbo")
+             ("messages" . [(("role" . "system")
+                             ("content" . "You are an assistant."))
+                            (("role" . "user")
+                             ("content" . "Hello"))])
+             ("stream" . t)))
+    :headers `(("Authorization" . ,(format "Bearer %s"
+                                           (auth-source-pick-first-password
+                                            :host "api.openai.com"
+                                            :user "plz-event-source")))
+               ("Content-Type" . "application/json")))
+#+END_SRC
+
+* Credits
+
+- Thanks to [[https://github.com/ahyatt][ahyatt]] and [[https://github.com/alphapapa][alphapapa]] for their help and advice.
+
+** Copyright assignment
+
+This package is part of [[https://www.gnu.org/software/emacs/][GNU Emacs]], being distributed in [[https://elpa.gnu.org/][GNU ELPA]].
+Contributions to this project must follow GNU guidelines, which means
+that, as with other parts of Emacs, patches of more than a few lines
+must be accompanied by having assigned copyright for the contribution
+to the FSF.  Contributors who wish to do so may contact
+[[mailto:emacs-devel@gnu.org][emacs-devel@gnu.org]] to request the assignment form.
+
+* License
+:PROPERTIES:
+:TOC:      :ignore (this)
+:END:
+
+GPLv3
+
+* COMMENT Export setup                                             :noexport:
+:PROPERTIES:
+:TOC:      :ignore (this descendants)
+:END:
+
+# Copied from org-super-agenda's readme, in which much was borrowed from Org's =org-manual.org=.
+
+#+OPTIONS: broken-links:t *:t
+
+** Info export options
+
+# NOTE: These are moved to the top of the file.
+
+** File-local variables
+
+# NOTE: Setting org-comment-string buffer-locally is a nasty hack to work around GitHub's org-ruby's HTML rendering, which does not respect noexport tags.  The only way to hide this tree from its output is to use the COMMENT keyword, but that prevents Org from processing the export options declared in it.  So since these file-local variables don't affect org-ruby, wet set org-comment-string to an unused keyword, which prevents Org from deleting this tree from the export buffer, which allows it to find the export options in it.  And since org-export does respect the noexport tag, the tree is excluded from the info page.
+
+# Local Variables:
+# eval: (require 'org-make-toc)
+# before-save-hook: org-make-toc
+# org-export-with-properties: ()
+# org-export-with-title: t
+# org-export-initial-scope: buffer
+# org-comment-string: "NOTCOMMENT"
+# End:
