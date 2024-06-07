@@ -3,8 +3,6 @@ Via: 1.1 tinyproxy (tinyproxy/1.11.0)
 Date: Fri, 07 Jun 2024 10:00:33 GMT
 Content-Type: text/event-stream; charset=utf-8
 Server: gunicorn/19.9.0
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Credentials: true
 
 data: {"id":"chatcmpl-9XTpQSnYvrct76xoKARLde2OZPhsF","object":"chat.completion.chunk","created":1717766512,"model":"gpt-3.5-turbo-0125","system_fingerprint":null,"choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}]}
 
