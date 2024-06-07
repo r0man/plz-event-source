@@ -382,6 +382,90 @@
           (should (equal 200 (plz-response-status data)))
           (should (null (plz-response-body data))))))))
 
+(ert-deftest test-plz-event-source:text/event-stream-proxy-http ()
+  (plz-event-source-test-with-mock-response (plz-event-source-test-response "text/event-stream/openai-proxy-http.txt")
+    (let* ((close-events) (else) (error-events) (finally) (message-events) (open-events) (then)
+           (process (plz-media-type-request 'post "MOCK-URL"
+                      :as `(media-types
+                            ,(cons (cons 'text/event-stream
+                                         (plz-event-source:text/event-stream
+                                          :events `((open . ,(lambda (event)
+                                                               (push event open-events)))
+                                                    (message . ,(lambda (event)
+                                                                  (push event message-events)))
+                                                    (error . ,(lambda (event)
+                                                                (push event error-events)))
+                                                    (close . ,(lambda (event)
+                                                                (push event close-events))))))
+                                   plz-media-types))
+                      :else (lambda (object) (push object else))
+                      :finally (lambda () (push t finally))
+                      :then (lambda (object) (push object then)))))
+      (plz-event-source-test-wait process)
+      (should (null else))
+      (should (equal '(t) finally))
+      (should (equal 1 (length open-events)))
+      (seq-doseq (event open-events)
+        (with-slots (data type) event
+          (should (equal 'open type))
+          (should (plz-response-p data))
+          (should (equal 200 (plz-response-status data)))
+          (should (null (plz-response-body data)))))
+      (sit-for 0.1)
+      (should (equal 0 (length error-events)))
+      (should (equal 1 (length close-events)))
+      (seq-doseq (event close-events)
+        (with-slots (data type) event
+          (should (equal 'close type))
+          (should (plz-response-p data))
+          (should (equal 200 (plz-response-status data)))
+          (should (null (plz-response-body data)))))
+      (should (equal 12 (length message-events)))
+      (should (equal "Hello! How can I assist you today?"
+                     (plz-event-source-test-openai-extract-content message-events))))))
+
+(ert-deftest test-plz-event-source:text/event-stream-proxy-https ()
+  (plz-event-source-test-with-mock-response (plz-event-source-test-response "text/event-stream/openai-proxy-https.txt")
+    (let* ((close-events) (else) (error-events) (finally) (message-events) (open-events) (then)
+           (process (plz-media-type-request 'post "MOCK-URL"
+                      :as `(media-types
+                            ,(cons (cons 'text/event-stream
+                                         (plz-event-source:text/event-stream
+                                          :events `((open . ,(lambda (event)
+                                                               (push event open-events)))
+                                                    (message . ,(lambda (event)
+                                                                  (push event message-events)))
+                                                    (error . ,(lambda (event)
+                                                                (push event error-events)))
+                                                    (close . ,(lambda (event)
+                                                                (push event close-events))))))
+                                   plz-media-types))
+                      :else (lambda (object) (push object else))
+                      :finally (lambda () (push t finally))
+                      :then (lambda (object) (push object then)))))
+      (plz-event-source-test-wait process)
+      (should (null else))
+      (should (equal '(t) finally))
+      (should (equal 1 (length open-events)))
+      (seq-doseq (event open-events)
+        (with-slots (data type) event
+          (should (equal 'open type))
+          (should (plz-response-p data))
+          (should (equal 200 (plz-response-status data)))
+          (should (null (plz-response-body data)))))
+      (sit-for 0.1)
+      (should (equal 0 (length error-events)))
+      (should (equal 1 (length close-events)))
+      (seq-doseq (event close-events)
+        (with-slots (data type) event
+          (should (equal 'close type))
+          (should (plz-response-p data))
+          (should (equal 200 (plz-response-status data)))
+          (should (null (plz-response-body data)))))
+      (should (equal 12 (length message-events)))
+      (should (equal "Hello! How can I assist you today?"
+                     (plz-event-source-test-openai-extract-content message-events))))))
+
 ;;;; footer
 
 (provide 'test-plz-event-source)
