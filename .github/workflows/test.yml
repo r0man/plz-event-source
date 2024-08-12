@@ -57,10 +57,6 @@ jobs:
 
     - uses: actions/checkout@v2
 
-    - name: Checkout unreleased dependencies
-      run: |
-        ./checkout
-
     - name: Install packages
       run: |
         sudo apt-get install curl ispell pv
