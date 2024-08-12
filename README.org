@@ -8,8 +8,6 @@
 source implementation for the [[https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events][Server Sent Event (SSE)]] protocol. It is
 used in the [[https://github.com/ahyatt/llm][LLM]] library to handle server sent events.
 
-👷🏽 NOTE: This is work in progress. The library is not yet on ELPA.
-
 - Package name (GNU ELPA): plz-event-source
 - Official manual: [[https://github.com/r0man/plz-event-source/blob/main/plz-event-source.org][https://github.com/r0man/plz-event-source/blob/main/plz-event-source.org]]
 - Git repository: [[https://github.com/r0man/plz-event-source][https://github.com/r0man/plz-event-source]]
