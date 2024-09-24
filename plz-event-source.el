@@ -11,11 +11,6 @@
 
 ;; This file is part of GNU Emacs.
 
-;; It is temporarily vendored within the llm library.  Please DO NOT
-;; depend on it!  It is subject to change.  Once we think this package
-;; is stable, we will release it to GNU ELPA.  If no serious issues
-;; are found, we plan to do this in Q4 of 2024.
-
 ;;; License:
 
 ;; This program is free software; you can redistribute it and/or modify
