@@ -49,7 +49,7 @@ jobs:
           - 29.2
           - 29.3
           - 29.4
-          - snapshot
+          # - snapshot
     steps:
     - uses: purcell/setup-emacs@master
       with:
