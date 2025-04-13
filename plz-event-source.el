@@ -5,7 +5,7 @@
 ;; Author: r0man <roman@burningswell.com>
 ;; Maintainer: r0man <roman@burningswell.com>
 ;; URL: https://github.com/r0man/plz-event-source
-;; Version: 0.1.3-pre
+;; Version: 0.1.3
 ;; Package-Requires: ((emacs "26.3") (plz-media-type "0.2.4"))
 ;; Keywords: comm, network, http
 
