@@ -114,7 +114,7 @@
   "Regular expression matching the end of a line.")
 
 (defconst plz-event-source-parser--line-regexp
-  (rx (* not-newline) (or "\r\n" "\n" "\r"))
+  (rx (*? not-newline) (or "\r\n" "\n" "\r"))
   "Regular expression matching a line of the event source stream.")
 
 (defun plz-event-source-parser--parse-bom (line)
